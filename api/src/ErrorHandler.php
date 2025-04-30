@@ -7,8 +7,9 @@ class ErrorHandler{
 
         echo json_encode([
            "code" => $exception->getcode(),
-           "file" => $exception->getcode(),
-           "line" => $exception->getcode() 
+           "message" => $exception->getMessage(),
+           "file" => $exception->getFile(),
+           "line" => $exception-> getLine()
         ], true);
     }
 

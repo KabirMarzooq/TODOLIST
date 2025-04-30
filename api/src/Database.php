@@ -8,7 +8,7 @@ class Database{
         private string $password,
     )
     {}
-    public function getConnection(): PDO | string{
+    public function getConnection(): PDO {
 
 
         $dsn = "mysql:host={$this->host};dbname={$this->name};charset=utf8";
