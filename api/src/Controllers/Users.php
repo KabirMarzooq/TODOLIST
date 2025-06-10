@@ -26,7 +26,36 @@ class Users
 
     public function signin(string $method): void
     {
-        echo "Hello our new todo app";
+
+        switch ($method) {
+            case "POST":
+                $payload = (array) json_decode(file_get_contents('php://input'));
+                $filter = $this->signin_filter($payload);
+
+                if (count($filter) > 0) {
+                    http_response_code(406);
+                    echo json_encode($filter, JSON_PRETTY_PRINT);
+                    break;
+                }
+
+                $response = $this->userService->login($payload['email'], $payload['password']);
+
+                if(!empty($response['error'])){
+                    http_response_code(422);
+                    echo json_encode($response, JSON_PRETTY_PRINT);
+                    break;
+                }
+
+                echo json_encode($response, JSON_PRETTY_PRINT);
+                break;
+
+
+            default:
+                http_response_code(405);
+
+                header("Allow: POST");
+        }
+
     }
 
     public function signup(string $method): void
@@ -102,6 +131,26 @@ class Users
 
         if(!empty($userData["password"]) && !preg_match('/[\W]/', $userData['password'])){
             $error[] = "password must contain at least one Special Character";
+        }
+
+        return $error;
+    }
+
+    function  signin_filter(array $userData): array
+    {
+
+        $error = [];
+
+        if (empty($userData['email'])) {
+            $error[] = 'email is required';
+        }
+
+        if (array_key_exists('email', $userData) && filter_var($userData['email'], FILTER_VALIDATE_EMAIL) === false) {
+            $error[] = 'not a valid email';
+        }
+
+        if (empty($userData["password"])) {
+            $error[] = "password is required";
         }
 
         return $error;

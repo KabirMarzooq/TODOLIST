@@ -31,6 +31,24 @@ class User{
 
     }
 
+    public function login (string $email, string $password): array{
+        
+        $sql = "SELECT * FROM user WHERE email = :email";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindValue(":email", $email, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        if($stmt->rowCount() > 0){
+            $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            return ['user_id' => $data['user_id'], 'name' => $data['name'], 'email' => $data['email'], 'password' => $data['password']];
+        }
+
+        return ['error' => 'Account does not exist'];
+    }
+
     public function verifyEmail(string $email): array{
 
         $sql = "SELECT * FROM user WHERE email =  :email";
@@ -47,4 +65,20 @@ class User{
         return ['message' => 'Email does not exist'];
     }
 
+    public function getUserEmail(string $email): bool{
+
+        $sql = "SELECT * FROM user WHERE email = :email";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindValue(":email", $email, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        if($stmt->rowCount() > 0){
+            return true;
+        }
+
+        return false;
+
+    }
 }
